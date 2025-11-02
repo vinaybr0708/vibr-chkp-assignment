@@ -26,6 +26,17 @@ Note: The entire process runs automatically through **GitHub Actions** — no ma
    - The CloudFront URL can be used to view or access uploaded files.
 
 ---
+## Prerequisites
+
+Before running the workflows:  
+- Add your AWS credentials (`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`) under:  
+  **GitHub repository → Settings → Secrets → Actions**
+- Make sure the IAM user used here has permissions for:  
+  - **S3**  
+  - **CloudFront**  
+  - **IAM**  
+  - **Terraform state management** (S3 backend, if applicable)
+---
 
 ## GitHub Actions Workflows
 
@@ -90,8 +101,6 @@ vibr-chkp-assignment/
 └── README.md
 </pre>
 
-
-
 ---
 
 ## How It Works !
@@ -111,5 +120,19 @@ vibr-chkp-assignment/
 - Region used: `ap-south-1` (Mumbai).
 
 ---
+
+**Implementation Notes**
+
+1. Why force_destroy = true for the S3 bucket
+Terraform doesn’t allow deleting a non-empty S3 bucket by default.
+The force_destroy = true setting ensures that the bucket and all its files can be deleted automatically during terraform destroy.
+This keeps cleanup easy and prevents manual intervention.
+
+2. Why index.html is used
+The index.html file acts as the main entry page for the static site hosted via S3 and CloudFront.
+When users open the CloudFront URL, AWS automatically serves this file as the homepage — a quick and simple way to verify that the deployment works properly.
+
+3. AWS Resource Tags
+All AWS resources (S3 and CloudFront) are tagged for easy identification, cost tracking, and better resource organization.
 
 
