@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - chkp-assignment
+    paths-ignore:
+      - '.github/workflows/destroy.yml'
+      - '.github/workflows/**destroy**.yml'  
   workflow_dispatch:
 
 env:
