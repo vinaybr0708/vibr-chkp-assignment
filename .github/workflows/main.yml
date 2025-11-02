@@ -6,13 +6,13 @@ on:
       - chkp-assignment
   workflow_dispatch:
 
+env:
+  AWS_REGION: ap-south-1
+
 jobs:
   terraform:
     name: Terraform Apply (Infra)
     runs-on: ubuntu-latest
-
-    env:
-      AWS_REGION: ap-south-1
 
     steps:
       - name: Checkout repository
