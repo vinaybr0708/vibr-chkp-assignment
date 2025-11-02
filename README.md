@@ -121,18 +121,23 @@ vibr-chkp-assignment/
 
 ---
 
-**Implementation Notes**
+### Implementation Notes
 
-1. Why force_destroy = true for the S3 bucket
-Terraform doesn’t allow deleting a non-empty S3 bucket by default.
-The force_destroy = true setting ensures that the bucket and all its files can be deleted automatically during terraform destroy.
-This keeps cleanup easy and prevents manual intervention.
+1. **Force Destroy in S3**  
+   Terraform doesn’t allow deleting a non-empty S3 bucket by default.  
+   The `force_destroy = true` setting ensures that the bucket and all its files can be deleted automatically during `terraform destroy`.  
+   This keeps cleanup easy and prevents manual intervention.
 
-2. Why index.html is used
-The index.html file acts as the main entry page for the static site hosted via S3 and CloudFront.
-When users open the CloudFront URL, AWS automatically serves this file as the homepage — a quick and simple way to verify that the deployment works properly.
+2. **Index.html Usage**  
+   The `index.html` file acts as the main entry page for the static site hosted via S3 and CloudFront.  
+   When users open the CloudFront URL, AWS automatically serves this file as the homepage, a quick and simple way to verify that the deployment works properly.
 
-3. AWS Resource Tags
-All AWS resources (S3 and CloudFront) are tagged for easy identification, cost tracking, and better resource organization.
+3. **AWS Resource Tags**  
+   All AWS resources (S3 and CloudFront) are tagged for easy identification, cost tracking, and better resource organization.
+
+4. **State Locking (DynamoDB)**  
+   State locking using DynamoDB is **not implemented** in this setup since it is a **demo/assignment project**.  
+   In production or enterprise environments, Terraform state is typically stored in an S3 bucket **with DynamoDB table-based locking** enabled, to prevent concurrent runs and ensure state consistency.
+
 
 
