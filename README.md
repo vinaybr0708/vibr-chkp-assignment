@@ -2,7 +2,7 @@
 
 ## Author / Repository Owner / PoC
 **Vinay B R**  
-DevOps Lead | AWS | Terraform | Kubernetes | CI/CD | 
+DevOps Lead | AWS | Terraform | Kubernetes | CI/CD  
 Bangalore, India
 
 ---
