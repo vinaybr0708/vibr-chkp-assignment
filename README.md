@@ -1,4 +1,4 @@
-# vibr Checkpoint Assignment
+# VIBR Checkpoint Assignment
 
 ## Author / Repository Owner / PoC
 **Vinay B R**  
