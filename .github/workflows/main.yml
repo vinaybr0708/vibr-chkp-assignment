@@ -47,15 +47,21 @@ jobs:
           echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
           echo "cloudfront_url=https://$CLOUDFRONT_URL" >> $GITHUB_OUTPUT
 
+      - name: Debug Outputs
+        run: |
+        echo "Bucket: ${{ steps.tf_outputs.outputs.bucket_name }}"
+        echo "CloudFront: ${{ steps.tf_outputs.outputs.cloudfront_url }}"
+    
+
   python:
     name: Python Data Processing
     runs-on: ubuntu-latest
     needs: terraform
 
-    # env:
-    #   AWS_REGION: ap-south-1
-    #   BUCKET_NAME: ${{ needs.terraform.outputs.bucket_name }}
-    #   CLOUDFRONT_URL: ${{ needs.terraform.outputs.cloudfront_url }}
+    env:
+      AWS_REGION: ap-south-1
+      BUCKET_NAME: ${{ needs.terraform.outputs.bucket_name }}
+      CLOUDFRONT_URL: ${{ needs.terraform.outputs.cloudfront_url }}
 
     steps:
       - name: Checkout repository
