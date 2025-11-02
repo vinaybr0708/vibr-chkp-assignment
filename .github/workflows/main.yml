@@ -47,10 +47,10 @@ jobs:
           echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
           echo "cloudfront_url=https://$CLOUDFRONT_URL" >> $GITHUB_OUTPUT
 
-      - name: Debug Outputs
-        run: |
-        echo "Bucket: ${{ steps.tf_outputs.outputs.bucket_name }}"
-        echo "CloudFront: ${{ steps.tf_outputs.outputs.cloudfront_url }}"
+      # - name: Debug Outputs
+      #   run: |
+      #   echo "Bucket: ${{ steps.tf_outputs.outputs.bucket_name }}"
+      #   echo "CloudFront: ${{ steps.tf_outputs.outputs.cloudfront_url }}"
     
 
   python:
