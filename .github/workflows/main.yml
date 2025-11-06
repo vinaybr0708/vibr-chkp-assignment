@@ -3,32 +3,32 @@ name: Deploy Infra and Run Python Code
 on:
   push:
     branches:
-      - chkp-assignment
+      - chkp-assignment-terragrunt
     paths-ignore:
       - '.github/workflows/destroy.yml'
-      - '.github/workflows/**destroy**.yml'  
+      - '.github/workflows/**destroy**.yml'
   workflow_dispatch:
 
 env:
   AWS_REGION: ap-south-1
 
 jobs:
-  terraform:
-    name: Terraform Apply (Infra)
+  terragrunt:
+    name: Terragrunt Apply (Infra)
     runs-on: ubuntu-latest
 
     outputs:
-      bucket_name: ${{ steps.tf_outputs.outputs.bucket_name }}
-      cloudfront_url: ${{ steps.tf_outputs.outputs.cloudfront_url }}
+      bucket_name: ${{ steps.tg_outputs.outputs.bucket_name }}
+      cloudfront_url: ${{ steps.tg_outputs.outputs.cloudfront_url }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v1.2.0
         with:
-          terraform_version: 1.9.5
+          terragrunt_version: latest
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -37,31 +37,32 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Terraform Init
-        run: terraform init
+      - name: Terragrunt Init
+        run: cd terraform/terragrunt && terragrunt run-all init --terragrunt-non-interactive
 
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan
+      - name: Terragrunt Plan
+        run: cd terraform/terragrunt && terragrunt run-all plan --terragrunt-non-interactive -out=tfplan
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve tfplan
+      - name: Terragrunt Apply
+        run: cd terraform/terragrunt && terragrunt run-all apply --terragrunt-non-interactive -auto-approve
 
-      - name: Capture Terraform Outputs
-        id: tf_outputs
+      - name: Capture Terragrunt Outputs
+        id: tg_outputs
         run: |
-          BUCKET_NAME=$(terraform output -raw bucket_name)
-          CLOUDFRONT_URL=$(terraform output -raw cloudfront_distribution_domain)
+          cd terraform/terragrunt
+          BUCKET_NAME=$(terragrunt output -raw bucket_name --terragrunt-working-dir s3)
+          CLOUDFRONT_URL=$(terragrunt output -raw cloudfront_domain_name --terragrunt-working-dir cloudfront)
           echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
           echo "cloudfront_url=https://$CLOUDFRONT_URL" >> $GITHUB_OUTPUT
 
   python:
     name: Python Data Processing
     runs-on: ubuntu-latest
-    needs: terraform
+    needs: terragrunt
 
     env:
-      BUCKET_NAME: ${{ needs.terraform.outputs.bucket_name }}
-      CLOUDFRONT_URL: ${{ needs.terraform.outputs.cloudfront_url }}
+      BUCKET_NAME: ${{ needs.terragrunt.outputs.bucket_name }}
+      CLOUDFRONT_URL: ${{ needs.terragrunt.outputs.cloudfront_url }}
 
     steps:
       - name: Checkout repository

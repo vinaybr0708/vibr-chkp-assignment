@@ -1,4 +1,4 @@
-name: Destroy AWS Infrastructure
+name: Destroy AWS Infrastructure (Terragrunt)
 
 on:
   workflow_dispatch:
@@ -7,18 +7,18 @@ env:
   AWS_REGION: ap-south-1
 
 jobs:
-  terraform-destroy:
-    name: Terraform Destroy
+  terragrunt-destroy:
+    name: Terragrunt Destroy
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v1.2.0
         with:
-          terraform_version: 1.9.5
+          terragrunt_version: latest
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -27,11 +27,5 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Terraform Init
-        run: terraform init
-
-      - name: Terraform Plan Destroy
-        run: terraform plan -destroy -out=tfplan-destroy
-
-      - name: Terraform Destroy
-        run: terraform apply -auto-approve tfplan-destroy
+      - name: Terragrunt Destroy
+        run: cd terraform/terragrunt && terragrunt run-all destroy --terragrunt-non-interactive -auto-approve

@@ -1,3 +1,7 @@
+terraform {
+  backend "s3" {}
+}
+
 resource "aws_s3_bucket" "vibrs3" {
   bucket = var.bucket_name
   force_destroy = true    # as it is assignment adding this value to avoid errors during destroy
@@ -14,9 +18,10 @@ resource "aws_s3_bucket" "vibrs3" {
 resource "aws_s3_object" "index_html" {
   bucket       = aws_s3_bucket.vibrs3.id
   key          = "index.html"
-  source       = "${path.root}/index.html"
+  # Use the path passed from Terragrunt (var.index_html_path points to repo-root index.html)
+  source       = "${path.module}/index.html"
   content_type = "text/html"
-  etag         = filemd5("${path.root}/index.html")
+  etag         = filemd5("${path.module}/index.html")
 
   tags = {
     Name = "index.html"

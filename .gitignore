@@ -10,6 +10,9 @@ override.tf.json
 terraform.tfvars.json
 modules.json
 
+# Terragrunt
+.terragrunt-cache/
+
 # Python
 __pycache__/
 *.pyc
