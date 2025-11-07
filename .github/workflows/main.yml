@@ -6,11 +6,7 @@ on:
       - chkp-assignment-terragrunt
     paths-ignore:
       - '.github/workflows/destroy.yml'
-      - '.github/workflows/**destroy**.yml'
   workflow_dispatch:
-
-- name: Check Terragrunt version
-  run: terragrunt --version
 
 env:
   AWS_REGION: ap-south-1
@@ -40,22 +36,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Terragrunt Init
-        run: cd terraform/terragrunt && terragrunt run-all init --non-interactive
-
-      - name: Terragrunt Validate
-        run: cd terraform/terragrunt && terragrunt run-all validate --non-interactive
-
-      - name: Terragrunt Plan
-        run: cd terraform/terragrunt && terragrunt run-all plan --out=tfplan --non-interactive
-
-      - name: Terragrunt Apply
-        run: cd terraform/terragrunt && terragrunt run-all apply --auto-approve --non-interactive --terragrunt-parallelism 10
+      - name: Terragrunt Init, Plan & Apply (All Modules)
+        run: |
+          cd terraform/terragrunt
+          # Apply S3 first
+          terragrunt init --terragrunt-working-dir s3 --non-interactive
+          terragrunt plan --terragrunt-working-dir s3 -out=tfplan --non-interactive
+          terragrunt apply --terragrunt-working-dir s3 --non-interactive
+          # Apply CloudFront next (depends on S3)
+          terragrunt init --terragrunt-working-dir cloudfront --non-interactive
+          terragrunt plan --terragrunt-working-dir cloudfront -out=tfplan --non-interactive
+          terragrunt apply --terragrunt-working-dir cloudfront --non-interactive
 
       - name: Capture Terragrunt Outputs
         id: tg_outputs
         run: |
-          set -e
           cd terraform/terragrunt
           BUCKET_NAME=$(terragrunt output -raw bucket_name --terragrunt-working-dir s3)
           CLOUDFRONT_URL=$(terragrunt output -raw cloudfront_domain_name --terragrunt-working-dir cloudfront)
