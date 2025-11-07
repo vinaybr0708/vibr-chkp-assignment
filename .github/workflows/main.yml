@@ -38,17 +38,21 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Terragrunt Init
-        run: cd terraform/terragrunt && terragrunt run-all init --terragrunt-non-interactive
+        run: cd terraform/terragrunt && terragrunt run-all init --non-interactive
+
+      - name: Terragrunt Validate
+        run: cd terraform/terragrunt && terragrunt run-all validate --non-interactive
 
       - name: Terragrunt Plan
-        run: cd terraform/terragrunt && terragrunt run-all plan --terragrunt-non-interactive -out=tfplan
+        run: cd terraform/terragrunt && terragrunt run-all plan --out=tfplan --non-interactive
 
       - name: Terragrunt Apply
-        run: cd terraform/terragrunt && terragrunt run-all apply --terragrunt-non-interactive -auto-approve
+        run: cd terraform/terragrunt && terragrunt run-all apply --auto-approve --non-interactive --terragrunt-parallelism 10
 
       - name: Capture Terragrunt Outputs
         id: tg_outputs
         run: |
+          set -e
           cd terraform/terragrunt
           BUCKET_NAME=$(terragrunt output -raw bucket_name --terragrunt-working-dir s3)
           CLOUDFRONT_URL=$(terragrunt output -raw cloudfront_domain_name --terragrunt-working-dir cloudfront)
@@ -74,7 +78,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install boto3 requests
+        run: pip install -r python/requirements.txt || pip install boto3 requests
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
