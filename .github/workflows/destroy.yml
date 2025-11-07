@@ -1,6 +1,11 @@
-name: Destroy AWS Infrastructure (Terragrunt)
+name: Destroy Infra
 
 on:
+  push:
+    branches:
+      - chkp-assignment-terragrunt
+    paths-ignore:
+      - '.github/workflows/main.yml'
   workflow_dispatch:
 
 env:
@@ -8,7 +13,7 @@ env:
 
 jobs:
   terragrunt-destroy:
-    name: Terragrunt Destroy
+    name: Terragrunt Destroy (Infra)
     runs-on: ubuntu-latest
 
     steps:
@@ -27,5 +32,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Terragrunt Destroy
-        run: cd terraform/terragrunt && terragrunt run-all destroy --terragrunt-non-interactive -auto-approve
+      - name: Destroy CloudFront
+        run: |
+          cd terraform/terragrunt/cloudfront
+          terragrunt destroy --non-interactive
+
+      - name: Destroy S3
+        run: |
+          cd terraform/terragrunt/s3
+          terragrunt destroy --non-interactive
