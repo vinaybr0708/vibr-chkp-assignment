@@ -5,14 +5,19 @@ remote_state {
   backend = "s3"
 
   config = {
-    bucket         = "vibr-chkp-tfstate"                 # existing S3 bucket for state
+    bucket         = "vibr-chkp-tfstate"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = "ap-south-1"
     encrypt        = true
-    # dynamodb_table = "vibr-chkp-tfstate-lock"            # for state locking
+
+    # Only use DynamoDB lock table if env var TERRAGRUNT_DISABLE_LOCK is NOT set
+    dynamodb_table = (
+      getenv("TERRAGRUNT_DISABLE_LOCK", "") == "" ?
+      "vibr-chkp-tfstate-lock" :
+      ""
+    )
   }
 }
-
 
 # Terraform Source (inherited by children)
 terraform {
@@ -21,7 +26,6 @@ terraform {
     required_var_files = []
   }
 }
-
 
 # Common inputs shared across modules
 inputs = {
