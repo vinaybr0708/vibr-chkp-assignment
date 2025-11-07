@@ -36,17 +36,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Terragrunt Init, Plan & Apply (All Modules)
+      - name: Apply S3 (Base Infra)
         run: |
-          cd terraform/terragrunt
-          # Apply S3 first
-          terragrunt init --terragrunt-working-dir s3 --non-interactive
-          terragrunt plan --terragrunt-working-dir s3 -out=tfplan --non-interactive
-          terragrunt apply --terragrunt-working-dir s3 --non-interactive
-          # Apply CloudFront next (depends on S3)
-          terragrunt init --terragrunt-working-dir cloudfront --non-interactive
-          terragrunt plan --terragrunt-working-dir cloudfront -out=tfplan --non-interactive
-          terragrunt apply --terragrunt-working-dir cloudfront --non-interactive
+          cd terraform/terragrunt/s3
+          terragrunt init --non-interactive
+          terragrunt plan --non-interactive
+          terragrunt apply --non-interactive
+
+      - name: Apply CloudFront (Dependent on S3)
+        run: |
+          cd terraform/terragrunt/cloudfront
+          terragrunt init --non-interactive
+          terragrunt plan --non-interactive
+          terragrunt apply --non-interactive
 
       - name: Capture Terragrunt Outputs
         id: tg_outputs
