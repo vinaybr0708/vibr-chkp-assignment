@@ -9,6 +9,9 @@ on:
       - '.github/workflows/**destroy**.yml'
   workflow_dispatch:
 
+- name: Check Terragrunt version
+  run: terragrunt --version
+
 env:
   AWS_REGION: ap-south-1
 
