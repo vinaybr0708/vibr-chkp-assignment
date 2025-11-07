@@ -12,7 +12,7 @@ remote_state {
 
     # Only use DynamoDB lock table if env var TERRAGRUNT_DISABLE_LOCK is NOT set
     dynamodb_table = (
-      getenv("TERRAGRUNT_DISABLE_LOCK", "") == "" ?
+      get_env("TERRAGRUNT_DISABLE_LOCK", "") == "" ?
       "vibr-chkp-tfstate-lock" :
       ""
     )
