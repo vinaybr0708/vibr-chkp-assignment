@@ -10,6 +10,7 @@ on:
 
 env:
   AWS_REGION: ap-south-1
+  TERRAGRUNT_DISABLE_LOCK: "true"
 
 jobs:
   terragrunt:
@@ -24,13 +25,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ✅ Install Terraform (required for Terragrunt)
+      # Install Terraform (required for Terragrunt)
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: latest
 
-      # ✅ Install Terragrunt
+      # Install Terragrunt
       - name: Setup Terragrunt
         uses: autero1/action-terragrunt@v1.2.0
         with:
@@ -43,7 +44,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # ✅ Apply S3 module
+      # Apply S3 module
       - name: Apply S3 (Base Infra)
         run: |
           cd terraform/terragrunt/s3
@@ -51,7 +52,7 @@ jobs:
           terragrunt plan --non-interactive
           terragrunt apply --non-interactive
 
-      # ✅ Apply CloudFront module (depends on S3)
+      # Apply CloudFront module (depends on S3)
       - name: Apply CloudFront (Dependent on S3)
         run: |
           cd terraform/terragrunt/cloudfront
@@ -59,7 +60,7 @@ jobs:
           terragrunt plan --non-interactive
           terragrunt apply --non-interactive
 
-      # ✅ Capture outputs
+      # Capture outputs
       - name: Capture Terragrunt Outputs
         id: tg_outputs
         run: |
